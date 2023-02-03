@@ -1,8 +1,6 @@
 const fs = require('fs');
 const parse = require('csv-parse/sync').parse;
 
-console.log(parse);
-
 const adiDateToUTC = ({ date, time }) => {
     const [month, day, year] = date.split('/');
     const [hour, minute, second, _ms] = time.split('.')
