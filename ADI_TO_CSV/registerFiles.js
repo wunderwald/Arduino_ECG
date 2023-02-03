@@ -1,5 +1,5 @@
 const fs = require('fs');
-const writeJSON = require('../iBXX/writeJSON');
+const writeJSON = require('./writeJSON');
 
 //leaf := a directory with no subdirectories
 const isLeaf = dir => {

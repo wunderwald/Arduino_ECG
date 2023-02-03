@@ -1,4 +1,4 @@
-const writeJSON = require('../iBXX/writeJSON');
+const writeJSON = require('./writeJSON');
 const fs = require('fs');
 
 const mkdirIfNotExists = dir => {

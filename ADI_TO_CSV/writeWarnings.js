@@ -1,4 +1,4 @@
-const writeJSON = require('../iBXX/writeJSON');
+const writeJSON = require('./writeJSON');
 
 module.exports = warnings => {
     writeJSON(warnings, './warnings.json');
