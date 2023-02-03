@@ -28,6 +28,7 @@ const main = () => {
         //flatten data (create 1d stream per channel)
         const streams = flatten(recording);
 
+        console.log(streams);
     });
 };
 
