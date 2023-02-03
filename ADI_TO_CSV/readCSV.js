@@ -1,5 +1,5 @@
 const fs = require('fs');
-const parse = require('csv-parse/lib/sync');
+const parse = require('csv-parse/sync').parse;
 
 module.exports = relPath => {
     const content = fs.readFileSync(relPath, {encoding: "ascii"});
