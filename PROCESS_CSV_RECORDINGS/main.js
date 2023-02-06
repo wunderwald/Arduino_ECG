@@ -144,6 +144,7 @@ const summary = {
     meanMaxDeltaTime_ms: mean(timingDataPerRecording.map(d => d.maxDeltaTime_ms)).toFixed(4),
     meanUnmatchedPeaksRatio: unmatchedStats.mean.toFixed(4),
     medianUnmatchedPeaksRatio: unmatchedStats.median.toFixed(4),
+    totalNumPeaks: allDeltaTimes_ms.length,
 }
 
 // log output
