@@ -1,3 +1,9 @@
+/*
+by Moritz Wunderwald, 2023
+https://github.com/wunderwald/
+*/
+
+
 const fs = require('fs');
 const parse = require('csv-parse/sync').parse;
 

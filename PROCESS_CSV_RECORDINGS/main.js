@@ -1,3 +1,8 @@
+/*
+by Moritz Wunderwald, 2023
+https://github.com/wunderwald/
+*/
+
 import * as fs from 'fs';
 import { parse } from 'csv-parse/sync';
 import { sumaryStats, mean } from './stats.js';
