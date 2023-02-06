@@ -1,0 +1,14 @@
+{
+  "name": "adi_to_csv",
+  "version": "1.0.0",
+  "description": "This package converts adi data to input data for www.ibxx.at/validation using frameData and trialData from the matlab scripts.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv": "^6.2.6"
+  }
+}

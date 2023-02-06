@@ -1,0 +1,11 @@
+{
+    "meanDeltaTime_ms": "8.0512",
+    "medianDeltaTime_ms": "5.0000",
+    "minDeltaTime_ms": "-14.0000",
+    "maxDeltaTime_ms": "20.0000",
+    "meanMinDeltaTime_ms": "1.2500",
+    "meanMaxDeltaTime_ms": "12.0000",
+    "meanUnmatchedPeaksRatio": "0.0055",
+    "medianUnmatchedPeaksRatio": "0.0104",
+    "totalNumPeaks": 644
+}
