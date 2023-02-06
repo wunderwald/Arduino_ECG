@@ -1,6 +1,7 @@
 import os
 import neurokit2 as nk
 import pandas as pd
+import json
 
 inputDir = '../ADI_TO_CSV/data/output'
 outputDirDashboardInput = './dashboardInputData'
@@ -28,15 +29,21 @@ for inputFile in inputFiles:
     fingerRPeaks = fingerInfo["ECG_R_Peaks"]
     fingerSignalCleaned = fingerSignals["ECG_Clean"]
 
-    # collect dashoardInputData
-    dashoardInputData = {
+    # collect dashboardInputData
+    dashboardInputData = {
         'ecg': [{'index': i, 'ecg': ecg} for ecg, i in enumerate(ecgSignalCleaned)],
-        'peaks': rPeaks,
+        'peaks': rPeaks.tolist(),
         'startIndex': 0,
         'endIndex': len(ecgSignalCleaned),
         'removedRegions': [],
         'samplingRate': samplingRateLabchart
     }
+
+    # write dashboard input data to file
+    outputPathDashboardInput = f"{outputDirDashboardInput}/{inputFile.replace('.csv', '.json')}"
+    print(f"... Writing dashboard input data to {outputPathDashboardInput}.")
+    with open(outputPathDashboardInput, "w") as outfile:
+        json.dump(dashboardInputData, outfile)  
 
     # add cleaned signals and peaks to input data
     inputData['adi_ecg_clean_nk2'] = ecgSignalCleaned
@@ -44,10 +51,7 @@ for inputFile in inputFiles:
     inputData['adi_ecg_peaks_nk2'] = [5 if index in rPeaks else 0 for index in range(len(ecgSignalCleaned))]
     inputData['adi_finger_peaks_nk2'] = [5 if index in fingerRPeaks else 0 for index in range(len(fingerSignalCleaned))]
 
-    # write to files: .json as dashboard input, .csv for further processing
-    outputPathDashboardInput = f"{outputDirDashboardInput}/{inputFile.replace('.csv', '.json')}"
-    print(f"... Writing dashboard input data to {outputPathDashboardInput}.")
-
+    # write processed input data to csv
     outputPathProcessedData = f"{outputDirProcessedData}/{inputFile.replace('.csv', '_nk2.csv')}"
     print(f"... Writing processed data to {outputPathProcessedData}.")
     inputData.to_csv(outputPathProcessedData, index=False)
