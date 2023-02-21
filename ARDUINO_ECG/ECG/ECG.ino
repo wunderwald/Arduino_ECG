@@ -58,7 +58,7 @@ const int SD_chipSelect = 53;
 
 /* live data output settings */
 const bool serialOut = true;  // write data to serial/usb on each loop iteration
-const bool digitalOut = false;  // write peaks to digital output pin
+const bool digitalOut = true;  // write peaks to digital output pin
 const int PIN_DIGITAL_OUT = 31;
 
 /* Here, the most important parameters for the Pan-Tompkins algorithm can be changed*/
