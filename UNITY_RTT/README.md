@@ -25,3 +25,7 @@ This package contains a Unity project that is used in the process of estimating 
 - Arduino code for the receiver is in `./Arduino/ArdMob_RTT_PulseReceiver`
 - The Unity code is in `./ArdMobRTT`
 - The Code for the Arduino ECG is in `../ARDUINO_ECG/ECG`
+
+## Author
+
+This package has been written by Moritz Wunderwald ([github 🧑‍💻](https://github.com/wunderwald))
