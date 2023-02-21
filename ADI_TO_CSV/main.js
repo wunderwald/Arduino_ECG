@@ -1,8 +1,8 @@
 /*
 by Moritz Wunderwald, 2023
 https://github.com/wunderwald/
+moritzwunderwald@yahoo.de
 */
-
 
 const discoverInputFiles = require('./discoverInputFiles');
 const readRawDataAdi = require('./readRawData');

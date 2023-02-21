@@ -1,8 +1,8 @@
 /*
 by Moritz Wunderwald, 2023
 https://github.com/wunderwald/
+moritzwunderwald@yahoo.de
 */
-
 
 module.exports = samples => samples.reduce((out, sample) => {
     Object.keys(sample).forEach(key => {

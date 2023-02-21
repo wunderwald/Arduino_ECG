@@ -1,4 +1,6 @@
-# By Moritz Wunderwald, 2022
+# by Moritz Wunderwald, 2023
+# https://github.com/wunderwald/
+# moritzwunderwald@yahoo.de
 
 import os
 import neurokit2 as nk

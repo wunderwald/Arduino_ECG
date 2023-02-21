@@ -1,8 +1,8 @@
 /*
 by Moritz Wunderwald, 2023
 https://github.com/wunderwald/
+moritzwunderwald@yahoo.de
 */
-
 
 const fs = require('fs');
 const parse = require('csv-parse/sync').parse;

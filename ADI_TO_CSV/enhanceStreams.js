@@ -1,8 +1,8 @@
 /*
 by Moritz Wunderwald, 2023
 https://github.com/wunderwald/
+moritzwunderwald@yahoo.de
 */
-
 
 //alternative to Math.max for big arrays
 const max = arr => arr.reduce((currentMax, val) => {
