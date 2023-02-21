@@ -60,6 +60,10 @@ const int SD_chipSelect = 53;
 const bool serialOut = true;  // write data to serial/usb on each loop iteration
 const bool digitalOut = true;  // write peaks to digital output pin
 const int PIN_DIGITAL_OUT = 31;
+const bool USE_HIGH_WINDOW = true;
+const int HIGH_WINDOW = 25; // period of time that output stays high after changing from 0 to 1
+int highWindowCounter = 0;
+
 
 /* Here, the most important parameters for the Pan-Tompkins algorithm can be changed*/
 #define M 5          // Here you can change the size for the Highpass filter
@@ -203,7 +207,21 @@ void loop() {
 
   // write peak to digital out
   if (digitalOut) {
-    digitalWrite(PIN_DIGITAL_OUT, QRS ? HIGH : LOW);
+    // update high window
+    if(QRS){
+      highWindowCounter = HIGH_WINDOW;
+    }
+    else{
+      if(highWindowCounter > 0) highWindowCounter -= 1;
+    }
+    // write output using windowed method
+    if(USE_HIGH_WINDOW){
+      digitalWrite(PIN_DIGITAL_OUT, highWindowCounter > 0);
+    }
+    // write qrs without window method
+    else{
+      digitalWrite(PIN_DIGITAL_OUT, QRS ? HIGH : LOW);
+    }
   }
 
   /*//////////////////DEFINE WHICH VARIABLES YOU WANT TO TRANSFER TO THE SD CARD EVERY ITERATION. IF YOU WANT TO ADD MORE
