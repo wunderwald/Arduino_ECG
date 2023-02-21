@@ -12,10 +12,10 @@ This package contains a Unity project that is used in the process of estimating 
 ## Usage
 
 * In LabRecorder, record two channels: 
-- Direct output from Arduino ECG
-- Output of second Arduino 
+1. Direct output from Arduino ECG
+2. Output of second Arduino 
 * Arduino ECG sends peak data in two ways:
-- to ADI via analog output pin
-- to Unity through serial communication
+1. to ADI via analog output pin
+2. to Unity through serial communication
 * When a peak is registered in Unity, it sends a trigger to the second Arduino.
 * The second Arduino uses an analog output pin to forward it to ADI / LabRecorder
