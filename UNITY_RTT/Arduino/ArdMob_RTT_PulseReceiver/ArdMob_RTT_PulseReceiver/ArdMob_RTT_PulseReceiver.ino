@@ -6,7 +6,7 @@
 */
 
 int PULSE_OUT_PIN = 13;
-bool LOG = true;
+bool LOG = false;
 
 void log(int val)
 { 

@@ -61,7 +61,7 @@ const bool serialOut = true;  // write data to serial/usb on each loop iteration
 const bool digitalOut = true;  // write peaks to digital output pin
 const int PIN_DIGITAL_OUT = 31;
 const bool USE_HIGH_WINDOW = true;
-const int HIGH_WINDOW = 25; // period of time that output stays high after changing from 0 to 1
+const int HIGH_WINDOW = 10; // period of time that output stays high after changing from 0 to 1
 int highWindowCounter = 0;
 
 
