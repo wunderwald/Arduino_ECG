@@ -36,6 +36,7 @@ public class FrameRateLogger : MonoBehaviour
 
         if (timeElapsed >= 1f)
         {
+            Debug.Log(frameRate.ToString("0"));
             timeElapsed = 0f;
         }
     }
