@@ -150,12 +150,20 @@ export const summarizeLatencies = () => {
     const allUnmatchedPercentages = timingDataPerRecording.map(el => el.unmatchedRatio);
     const unmatchedStats = sumaryStats(allUnmatchedPercentages);
     const summary = {
-        meanDeltaTime_ms: deltaStats.mean.toFixed(4),
-        medianDeltaTime_ms: deltaStats.median.toFixed(4),
-        minDeltaTime_ms: deltaStats.min.toFixed(4),
-        maxDeltaTime_ms: deltaStats.max.toFixed(4),
-        meanMinDeltaTime_ms: mean(timingDataPerRecording.map(d => d.minDeltaTime_ms)).toFixed(4),
-        meanMaxDeltaTime_ms: mean(timingDataPerRecording.map(d => d.maxDeltaTime_ms)).toFixed(4),
+        meanRTT_ms: deltaStats.mean.toFixed(4),
+        medianRTT_ms: deltaStats.median.toFixed(4),
+        minRTT_ms: deltaStats.min.toFixed(4),
+        maxRTT_ms: deltaStats.max.toFixed(4),
+        meanMinRTT_ms: mean(timingDataPerRecording.map(d => d.minDeltaTime_ms)).toFixed(4),
+        meanMaxRTT_ms: mean(timingDataPerRecording.map(d => d.maxDeltaTime_ms)).toFixed(4),
+
+        meanLatency_ms: (deltaStats.mean / 2).toFixed(4),
+        medianLatency_ms: (deltaStats.median / 2).toFixed(4),
+        minLatency_ms: (deltaStats.min / 2).toFixed(4),
+        maxLatency_ms: (deltaStats.max / 2).toFixed(4),
+        meanMinLatency_ms: (mean(timingDataPerRecording.map(d => d.minDeltaTime_ms)) / 2).toFixed(4),
+        meanMaxLatency_ms: (mean(timingDataPerRecording.map(d => d.maxDeltaTime_ms)) / 2).toFixed(4),
+
         meanUnmatchedPeaksRatio: unmatchedStats.mean.toFixed(4),
         medianUnmatchedPeaksRatio: unmatchedStats.median.toFixed(4),
         totalNumPeaks: allDeltaTimes_ms.length,
