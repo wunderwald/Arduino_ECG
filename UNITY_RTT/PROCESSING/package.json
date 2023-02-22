@@ -1,0 +1,15 @@
+{
+  "name": "processing",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "summarizeLatencies.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^5.3.5"
+  }
+}
