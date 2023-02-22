@@ -14,6 +14,8 @@ const log = msg => LOG && console.log(`# ${msg}`);
 
 export const summarizeFrameRates = () => {
 
+    log("creating frame rate summary...");
+
     // get input files
     const INPUT_DIR = './data';
     const inputFiles = fs.readdirSync(INPUT_DIR)
@@ -51,5 +53,5 @@ export const summarizeFrameRates = () => {
 
     // write output to file
     fs.writeFileSync('./frameRateSummary.json', JSON.stringify(summary));
-    
+
 };

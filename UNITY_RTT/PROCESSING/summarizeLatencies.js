@@ -14,6 +14,8 @@ const log = msg => LOG && console.log(`# ${msg}`);
 
 export const summarizeLatencies = () => {
 
+    log("creating latency summary...");
+
     // get input files
     const INPUT_DIR = './data';
     const inputFiles = fs.readdirSync(INPUT_DIR)
