@@ -11,7 +11,6 @@ def sampleECG(ard):
         return None
     
 def monitorECG(ard, peakQueue):
-    while True:
-        peakDetected = sampleECG(ard)
-        if peakDetected:
-            peakQueue.put(True)
+    peakDetected = sampleECG(ard)
+    if peakDetected:   
+        peakQueue.put(True)
