@@ -1,4 +1,5 @@
 from psychopy import gui
+import re
 
 def parseNumHeartbeats(numHeartbeats):
     if not numHeartbeats:
@@ -7,6 +8,7 @@ def parseNumHeartbeats(numHeartbeats):
         return int(numHeartbeats)
     except:
         return -1
+
 
 def dialogueNumHeartbeats():
     inputIsValid = False
@@ -30,3 +32,27 @@ def dialogueNumHeartbeats():
         'numHeartbeats': numHeartbeats,
         'confidence': confidence
     }
+
+
+def testSubjectId(id):
+    exp = "^[0-9]{3}"
+    match = re.search(exp, str(id))
+    return (match != None) and (match.group() == str(id))
+    
+
+def dialogueSubjectId():
+    inputIsValid = False
+    subjectId = None
+    failedOnce = False
+    while not inputIsValid:
+        myDlg = gui.Dlg(title="")
+        myDlg.addField(f"Enter subject ID {'[ enter a positive integer with 3 digits ]' if failedOnce else ''}")
+        inputData = myDlg.show() 
+        if not myDlg.OK: 
+            failedOnce = True
+            continue
+        subjectId = inputData[0]
+        inputIsValid = testSubjectId(subjectId)
+        if not inputIsValid:
+            failedOnce = True
+    return subjectId
