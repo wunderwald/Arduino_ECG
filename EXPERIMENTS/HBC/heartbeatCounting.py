@@ -6,7 +6,7 @@ from psychopy.hardware import keyboard
 from functions.trialParams import makeTrialParams_HC
 from functions.write import makeCsvHC, csvToFile
 from functions.ui import dialogueNumHeartbeats, dialogueSubjectId
-from functions.ecg import monitorECG
+from functions.ecg import EcgMonitorThread
 from functions.audio import playSound
 
 # !!!
@@ -53,13 +53,13 @@ if __name__ == "__main__":
     ard = serial.Serial(port=ARD_PORT, baudrate=BAUD)
     log("# ... arduino ready")
 
-    # set up arduino thread & lock / peak queue
+    # set up peak queue
     log("# initializing peak queue...")
     peakQueue = queue.Queue()
 
-    # set up arduino thread & lock / peak queue
+    # set up ecg monitor thread
     log("# initializing threading...")
-    monitorThread = threading.Thread(target=monitorECG, args=(ard, peakQueue))
+    monitorThread = EcgMonitorThread(ard=ard, peakQueue=peakQueue)
     monitorThread.start()
 
     # init subject and trial data
@@ -159,15 +159,9 @@ if __name__ == "__main__":
     finally:
         # close thread
         log("Closing monitor thread.")
-        if monitorThread.is_alive():
-            monitorThread._stop()
-        monitorThread.join()
+        monitorThread.stop()
         log("Terminated successfully.")
 
-        
-
-    # TODO:
-    # - use input window for subject id
 
 
 
