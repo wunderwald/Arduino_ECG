@@ -59,7 +59,7 @@ const int SD_chipSelect = 53;
 /* live data output settings */
 const bool SERIAL_OUT = true;  // write data to serial/usb on each loop iteration
 const bool DIGITAL_OUT = true;  // write peaks to digital output pin
-const bool ECG_SIGNAL_TO_SERIAL = false; // "<peak>, <level>, <millis>" instead of "<peak>" ----- !!!!! set to FALSE for all code except from HBC experiment !!!!!
+const bool ECG_SIGNAL_TO_SERIAL = true; // "<peak>, <level>, <millis>" instead of "<peak>" ----- !!!!! set to FALSE for all code except from HBC experiment !!!!!
 const int PIN_DIGITAL_OUT = 31;
 const bool USE_HIGH_WINDOW = true;
 const int HIGH_WINDOW = 10; // period of time that output stays high after changing from 0 to 1
@@ -199,12 +199,15 @@ void loop() {
     //Serial.print(",");
     //Serial.print(millis()); // Sample number
     //Serial.print(",");
-    Serial.println(QRS);
     if(ECG_SIGNAL_TO_SERIAL){
+      Serial.print(QRS);
       Serial.print(",");
       Serial.print(next_ecg_pt);
       Serial.print(",");
-      Serial.print(millis());
+      Serial.println(millis());
+    }
+    else{
+      Serial.println(QRS);
     }
     //Serial.print(",");
     //Serial.println(RR_peak);
