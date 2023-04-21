@@ -204,7 +204,7 @@ void loop() {
       Serial.print(",");
       Serial.print(next_ecg_pt);
       Serial.print(",");
-      Serial.print(millis()); // Sample number
+      Serial.print(millis());
     }
     //Serial.print(",");
     //Serial.println(RR_peak);
