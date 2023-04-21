@@ -24,9 +24,11 @@ def sampleECG(ard):
         inputParsed = parseInput(inputDecoded);
         peakDetected = bool(int(inputParsed['peak']))
         ecgLevel = int(inputParsed['ecg'])
+        millis = int(inputParsed['millis'])
         return {
             'peakDetected': peakDetected,
-            'ecgLevel': ecgLevel
+            'ecgLevel': ecgLevel,
+            'millis': millis
         }
     except:
         print("! unexpected error while sampling ECG")
@@ -36,7 +38,13 @@ def monitorECG(ard, peakQueue, ecgSignal):
     ecgData = sampleECG(ard)
     if ecgData['peakDetected']:   
         peakQueue.put(True)
-    ecgSignal.append({'millis': ecgData['millis'], 'ecgLevel': ecgData['ecgLevel']})
+    ecgSignal.append({
+        'millis': ecgData['millis'], 
+        'ecgLevel': ecgData['ecgLevel'], 
+        'peakDetected': ecgData['peakDetected'],
+        'trialStart': False,
+        'trialEnd': False,
+    })
 
 
 class EcgMonitorThread(threading.Thread):
