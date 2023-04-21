@@ -4,7 +4,7 @@ import threading
 from psychopy import core, visual
 from psychopy.hardware import keyboard
 from functions.trialParams import makeTrialParams_HC
-from functions.write import makeCsvHC, csvToFile
+from functions.write import makeSubjectCsv, makeEcgCsv, csvToFile
 from functions.ui import dialogueNumHeartbeats, dialogueSubjectId
 from functions.ecg import EcgMonitorThread
 from functions.audio import playSound
@@ -54,8 +54,9 @@ if __name__ == "__main__":
     log("# ... arduino ready")
 
     # set up peak queue
-    log("# initializing peak queue...")
+    log("# initializing peak queue and ecg recording signal...")
     peakQueue = queue.Queue()
+    ecgSignal = []
 
     # set up ecg monitor thread
     log("# initializing threading...")
@@ -100,6 +101,9 @@ if __name__ == "__main__":
             # mark trial start w sound
             playSound()
 
+            # mark trial start in ecg data
+            ecgSignal[len(ecgSignal)-1]['trialStart'] = True
+
             # run trial
             peakDetected_last = False
             while timer.getTime() - trial['startTime_s'] < trial['duration_s']:
@@ -136,6 +140,9 @@ if __name__ == "__main__":
             # mark trial end w sound
             playSound()
 
+            # mark trial start in ecg data
+            ecgSignal[len(ecgSignal)-1]['trialEnd'] = True
+
             # get user input
             if not endExperiment:
                 drawText(win=win, txt="Enter how many heartbeats you counted!")
@@ -153,8 +160,11 @@ if __name__ == "__main__":
                 kbWaitForKey(kb=kb, keyCode='space')
 
         # write data
-        outputCsv = makeCsvHC(trialData)
+        log("Writing subject data to file...")
+        outputCsv = makeSubjectCsv(trialData)
         csvToFile(csv=outputCsv, dir=OUTPUT_DIR, filename = "" + str(subjectId) + ".csv")
+        ecgCsv = makeEcgCsv(ecgSignal)
+        csvToFile(csv=ecgCsv, dir=OUTPUT_DIR, filename = "ecg_" + str(subjectId) + ".csv")
 
     finally:
         # close thread
