@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     # set up ecg monitor thread
     log("# initializing threading...")
-    monitorThread = EcgMonitorThread(ard=ard, peakQueue=peakQueue)
+    monitorThread = EcgMonitorThread(ard=ard, peakQueue=peakQueue, ecgSignal=ecgSignal)
     monitorThread.start()
 
     # init subject and trial data
