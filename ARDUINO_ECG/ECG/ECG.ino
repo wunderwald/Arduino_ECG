@@ -57,8 +57,9 @@ const int heartPin = A1;
 const int SD_chipSelect = 53;
 
 /* live data output settings */
-const bool serialOut = true;  // write data to serial/usb on each loop iteration
-const bool digitalOut = true;  // write peaks to digital output pin
+const bool SERIAL_OUT = true;  // write data to serial/usb on each loop iteration
+const bool DIGITAL_OUT = true;  // write peaks to digital output pin
+const bool ECG_LEVEL_TO_SERIAL = true; // "<peak>, <level>"" instead of "<peak>"
 const int PIN_DIGITAL_OUT = 31;
 const bool USE_HIGH_WINDOW = true;
 const int HIGH_WINDOW = 10; // period of time that output stays high after changing from 0 to 1
@@ -178,7 +179,7 @@ void setup() {
   }
 
 
-  if (digitalOut) {
+  if (DIGITAL_OUT) {
     pinMode(PIN_DIGITAL_OUT, OUTPUT);
   }
 }
@@ -193,20 +194,22 @@ void loop() {
   int next_ecg_pt = analogRead(heartPin);
 
   ////////////////////// WRITE DOWN ALL THE VARIABLES THAT SHOULD BE DISPLAYED HERE //////////////////////////////////////
-  if (serialOut && Experiment_settings == false) {
+  if (SERIAL_OUT && Experiment_settings == false) {
     //Serial.print(i++); // Sample number
     //Serial.print(",");
     //Serial.print(millis()); // Sample number
     //Serial.print(",");
     Serial.println(QRS);
-    Serial.print(",");
-    Serial.print(next_ecg_pt);
+    if(ECG_LEVEL_TO_SERIAL){
+      Serial.print(",");
+      Serial.print(next_ecg_pt);
+    }
     //Serial.print(",");
     //Serial.println(RR_peak);
   }
 
   // write peak to digital out
-  if (digitalOut) {
+  if (DIGITAL_OUT) {
     // update high window
     if(QRS){
       highWindowCounter = HIGH_WINDOW;
