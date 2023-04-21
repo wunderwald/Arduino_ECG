@@ -1,23 +1,42 @@
-
-    
 import threading
+
+def parseInput(inputString):
+    inputParts = inputString.split(',')
+    parsed = {
+        'peak': 0,
+        'ecg': -1,
+        'millis': -1,
+    }
+    if(inputParts[0] and inputParts[0] != ''):
+        parsed['peak'] = inputParts[0]
+    if(inputParts[1] and inputParts[1] != ''):
+        parsed['ecg'] = inputParts[1]
+    if(inputParts[2] and inputParts[2] != ''):
+        parsed['millis'] = inputParts[2]
+    return parsed
 
 def sampleECG(ard):
     try:
         inputRaw = ard.readline()
-        inputParsed = inputRaw.decode('utf-8').replace('\r', '').replace('\n', '')
-        if inputParsed == '':
+        inputDecoded = inputRaw.decode('utf-8').replace('\r', '').replace('\n', '')
+        if inputDecoded == '':
             return None
-        peakDetected = bool(int(inputParsed))
-        return peakDetected
+        inputParsed = parseInput(inputDecoded);
+        peakDetected = bool(int(inputParsed['peak']))
+        ecgLevel = int(inputParsed['ecg'])
+        return {
+            'peakDetected': peakDetected,
+            'ecgLevel': ecgLevel
+        }
     except:
         print("! unexpected error while sampling ECG")
         return None
     
-def monitorECG(ard, peakQueue):
-    peakDetected = sampleECG(ard)
-    if peakDetected:   
+def monitorECG(ard, peakQueue, ecgSignal):
+    ecgData = sampleECG(ard)
+    if ecgData['peakDetected']:   
         peakQueue.put(True)
+    ecgSignal.append({'millis': ecgData['millis'], 'ecgLevel': ecgData['ecgLevel']})
 
 
 class EcgMonitorThread(threading.Thread):
