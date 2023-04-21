@@ -10,11 +10,11 @@ def makeCsv(data, keys):
 
 def makeSubjectCsv(trialData):
     keys = ['subjectId', 'trialIndex', 'duration_s', 'numHeartbeatsTracked', 'numHeartbeatsCounted', 'confidenceRating', 'startTime_s', 'endTime_s']
-    makeCsv(data=trialData, keys=keys)
+    return makeCsv(data=trialData, keys=keys)
 
 def makeEcgCsv(ecgSignal):
     keys = ['millis', 'ecgLevel', 'peakDetected', 'trialStart', 'trialEnd']
-    makeCsv(data=ecgSignal, keys=keys)
+    return makeCsv(data=ecgSignal, keys=keys)
 
 def csvToFile(csv, dir, filename):
     # make dirs if necessary

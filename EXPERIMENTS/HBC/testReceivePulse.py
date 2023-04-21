@@ -4,6 +4,7 @@ import threading
 from psychopy import core
 from psychopy.hardware import keyboard
 from functions.ecg import EcgMonitorThread
+from functions.write import makeEcgCsv
 #
 
 # !!!
@@ -32,10 +33,11 @@ if __name__ == "__main__":
     # set up arduino thread & lock / peak queue
     log("# initializing peak queue...")
     peakQueue = queue.Queue()
+    ecgSignal = queue.Queue()
 
     # set up arduino thread & lock / peak queue
     log("# initializing threading...")
-    monitorThread = EcgMonitorThread(ard=ard, peakQueue=peakQueue)
+    monitorThread = EcgMonitorThread(ard=ard, peakQueue=peakQueue, ecgSignal=ecgSignal)
     monitorThread.start()
 
     # set up timer and keyboard
@@ -76,10 +78,14 @@ if __name__ == "__main__":
 
             # wait
             core.wait(.1)
-                    
+
+        # log ecg signal
+        # ecgCsv = makeEcgCsv(ecgSignal=list(ecgSignal.queue))
+        # print(ecgCsv)      
 
 
     finally:
+    
         # close thread
         log("Closing monitor thread.")
         monitorThread.stop()

@@ -36,9 +36,11 @@ def sampleECG(ard):
     
 def monitorECG(ard, peakQueue, ecgSignal):
     ecgData = sampleECG(ard)
+    if not ecgData: 
+        return
     if ecgData['peakDetected']:   
         peakQueue.put(True)
-    ecgSignal.append({
+    ecgSignal.put({
         'millis': ecgData['millis'], 
         'ecgLevel': ecgData['ecgLevel'], 
         'peakDetected': ecgData['peakDetected'],
