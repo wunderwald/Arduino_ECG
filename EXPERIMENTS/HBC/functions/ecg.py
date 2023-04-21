@@ -40,15 +40,16 @@ def monitorECG(ard, peakQueue, ecgSignal):
 
 
 class EcgMonitorThread(threading.Thread):
-    def __init__(self, ard, peakQueue):
+    def __init__(self, ard, peakQueue, ecgSignal):
         super().__init__()
         self.stop_flag = threading.Event()
         self.ard = ard
         self.peakQueue = peakQueue
+        self.ecgSignal = ecgSignal
 
     def run(self):
         while not self.stop_flag.is_set():
-            monitorECG(ard=self.ard, peakQueue=self.peakQueue)
+            monitorECG(ard=self.ard, peakQueue=self.peakQueue, ecgSignal=self.ecgSignal)
             pass
 
     def stop(self):
