@@ -6,13 +6,13 @@ const int DIGITAL_OUT_PIN = 31;
 
 // Piezo sound settings
 bool PLAY_SOUND = false; /* You can define if you want to activate (true) or deactivate (false) your soundbuzzer. */
-int SOUND_FREQ = 1000;  // The frequency of the sound
-int SOUND_DURATION = 20;   // The duration of the sound in millisconds
+int SOUND_FREQ = 1000;   // The frequency of the sound
+int SOUND_DURATION = 20; // The duration of the sound in millisconds
 
 // live data output settings
-const bool SERIAL_OUT = true;  // write data to serial/usb on each loop iteration
-const bool DIGITAL_OUT = true;  // write peaks to digital output pin
-const bool ECG_SIGNAL_TO_SERIAL = false; // "<peak>, <level>, <millis>" instead of "<peak>" 
+const bool SERIAL_OUT = false;         // write data to serial/usb on each loop iteration
+const bool INTERNALS_TO_SERIAL = true; // write filtered signals and adaptive thresh to serial
+const bool DIGITAL_OUT = true;         // write peaks to digital output pin
 const bool USE_HIGH_WINDOW = true;
 const int HIGH_WINDOW = 10; // period of time that output stays high after changing from 0 to 1
 int highWindowCounter = 0;
@@ -20,10 +20,10 @@ int highWindowCounter = 0;
 
 // ----- Libraries -----
 // If you get a compiler error here, you do not have this library. Go to "Tools" --> "Manage libraries" and copy the library name in the field on the top and install it.
-#include <ResponsiveAnalogRead.h>  
-#include <SPI.h>                   
-#include <SD.h>                   
-#include <Adafruit_GFX.h>          
+#include <ResponsiveAnalogRead.h>
+#include <SPI.h>
+#include <SD.h>
+#include <Adafruit_GFX.h>
 // ----- End Libraries -----
 
 // ----- Constants -----
@@ -32,9 +32,9 @@ int highWindowCounter = 0;
 // ----- End Constants -----
 
 // ----- Pan-Tompkins Algorithm Parameters -----
-#define M 5          // Here you can change the size for the Highpass filter
-#define N 30         // Here you can change the size for the Lowpass filter
-#define winSize 250  // this value defines the windowsize which effects the sensitivity of the QRS-detection. May need adjustments depending on your sample size. If you use a lower sampling rate, a lower windowSize might yield  better results.
+#define M 5         // Here you can change the size for the Highpass filter
+#define N 30        // Here you can change the size for the Lowpass filter
+#define winSize 250 // this value defines the windowsize which effects the sensitivity of the QRS-detection. May need adjustments depending on your sample size. If you use a lower sampling rate, a lower windowSize might yield  better results.
 // ----- End Pan-Tompkins Algorithm Parameters -----
 
 // ----- Pan-Tompkins algorithm -----
@@ -42,13 +42,13 @@ int highWindowCounter = 0;
 
 // circular buffer for input ecg signal
 // we need to keep a history of M + 1 samples for HP filter
-float ecgBuffer[M + 1] = { 0 };
+float ecgBuffer[M + 1] = {0};
 int ecgBufferIndex_write = 0;
 int ecgBufferIndex_read = 0;
 
 // circular buffer for input ecg signal
 // we need to keep a history of N+1 samples for LP filter
-float hpfBuffer[N + 1] = { 0 };
+float hpfBuffer[N + 1] = {0};
 int hpfBufferIndex_write = 0;
 int hpfBufferIndex_read = 0;
 
@@ -62,7 +62,7 @@ float lpfSum = 0;
 
 // working variables for adaptive thresholding
 float adaptiveThreshold = 0;
-boolean qrsTriggered = false;
+bool qrsTriggered = false;
 int qrsTriggeredLoopCounter = 0;
 float maxSampleInWindow = 0;
 int indexInWindow = 0;
@@ -71,24 +71,29 @@ int indexInWindow = 0;
 int numIterationsInWindow = 0;
 
 // detection algorithm
-boolean detectQRS(float new_ecg_pt) {
+bool detectQRS(float currentEcgSample)
+{
   // copy new point into circular buffer, increment index
-  ecgBuffer[ecgBufferIndex_write++] = new_ecg_pt;
+  ecgBuffer[ecgBufferIndex_write++] = currentEcgSample;
   ecgBufferIndex_write %= (M + 1);
 
   // temp variable
   int ecgBufferIndex_tmp = 0;
 
   // High pass filtering (HPF)
-  if (numIterationsInWindow < M) {
+  if (numIterationsInWindow < M)
+  {
     // first fill buffer with enough points for HP filter
     hpfSum += ecgBuffer[ecgBufferIndex_read];
     hpfBuffer[hpfBufferIndex_write] = 0;
-  } else {
+  }
+  else
+  {
     hpfSum += ecgBuffer[ecgBufferIndex_read];
 
     ecgBufferIndex_tmp = ecgBufferIndex_read - M;
-    if (ecgBufferIndex_tmp < 0) ecgBufferIndex_tmp += M + 1;
+    if (ecgBufferIndex_tmp < 0)
+      ecgBufferIndex_tmp += M + 1;
 
     hpfSum -= ecgBuffer[ecgBufferIndex_tmp];
 
@@ -96,7 +101,8 @@ boolean detectQRS(float new_ecg_pt) {
     float y2 = 0;
 
     ecgBufferIndex_tmp = (ecgBufferIndex_read - ((M + 1) / 2));
-    if (ecgBufferIndex_tmp < 0) ecgBufferIndex_tmp += M + 1;
+    if (ecgBufferIndex_tmp < 0)
+      ecgBufferIndex_tmp += M + 1;
 
     y2 = ecgBuffer[ecgBufferIndex_tmp];
 
@@ -117,13 +123,17 @@ boolean detectQRS(float new_ecg_pt) {
   // shift in new sample from high pass filter
   lpfSum += hpfBuffer[hpfBufferIndex_read] * hpfBuffer[hpfBufferIndex_read];
 
-  if (numIterationsInWindow < N) {
+  if (numIterationsInWindow < N)
+  {
     // first fill buffer with enough points for LP filter
     ecgSampleFiltered = 0;
-  } else {
+  }
+  else
+  {
     // shift out oldest data point
     ecgBufferIndex_tmp = hpfBufferIndex_read - N;
-    if (ecgBufferIndex_tmp < 0){
+    if (ecgBufferIndex_tmp < 0)
+    {
       ecgBufferIndex_tmp += (N + 1);
     }
     lpfSum -= hpfBuffer[ecgBufferIndex_tmp] * hpfBuffer[ecgBufferIndex_tmp];
@@ -135,36 +145,42 @@ boolean detectQRS(float new_ecg_pt) {
   hpfBufferIndex_read++;
   hpfBufferIndex_read %= (N + 1);
 
-
   // Adapative thresholding for beat detection
   // set initial threshold
-  if (numIterationsInWindow < winSize) {
-    if (ecgSampleFiltered > adaptiveThreshold) {
+  if (numIterationsInWindow < winSize)
+  {
+    if (ecgSampleFiltered > adaptiveThreshold)
+    {
       adaptiveThreshold = ecgSampleFiltered;
     }
     numIterationsInWindow++;
   }
 
   // check if detection hold off period has passed
-  if (qrsTriggered == true) {
+  if (qrsTriggered == true)
+  {
     qrsTriggeredLoopCounter++;
-    if (qrsTriggeredLoopCounter >= 100) {
+    if (qrsTriggeredLoopCounter >= 100)
+    {
       qrsTriggered = false;
       qrsTriggeredLoopCounter = 0;
     }
   }
 
   // find if we have a new max
-  if (ecgSampleFiltered > maxSampleInWindow) maxSampleInWindow = ecgSampleFiltered;
+  if (ecgSampleFiltered > maxSampleInWindow)
+    maxSampleInWindow = ecgSampleFiltered;
 
   // find if we are above adaptive threshold: if yes, peak has been detected
-  if (ecgSampleFiltered > adaptiveThreshold && !qrsTriggered) {
+  if (ecgSampleFiltered > adaptiveThreshold && !qrsTriggered)
+  {
     qrsTriggered = true;
     return true;
   }
 
   // adjust adaptive threshold using max of sample in previous window
-  if (indexInWindow++ >= winSize) {
+  if (indexInWindow++ >= winSize)
+  {
     // weighting factor for determining the contribution of
     // the current peak value to the threshold adjustment
     float gamma = 0.4;
@@ -190,7 +206,7 @@ boolean detectQRS(float new_ecg_pt) {
 // enable responsive analog read on the ECG pin
 ResponsiveAnalogRead analog(HEART_PIN, true);
 
-// calculation of time between QRS interval 
+// calculation of time between QRS interval
 int timeCprRead1_millis = 0;
 int timeCprRead2_millis = 0;
 int timeCPR = 0;
@@ -198,9 +214,9 @@ float cprInterval_millis;
 int currentEcgSample;
 
 // timing of peaks
-unsigned long timeCurrentPeak_micros = 0;      // time at which last QRS was found
-unsigned long timePreviousPeak = 0;  // time at which QRS before last was found
-unsigned long currentMicros = 0;        // current time
+unsigned long timeCurrentPeak_micros = 0; // time at which last QRS was found
+unsigned long timePreviousPeak = 0;       // time at which QRS before last was found
+unsigned long currentMicros = 0;          // current time
 unsigned long timeRRPeak_millis = 0;
 
 // loop timing
@@ -208,61 +224,78 @@ float lastLoopDuration_millis = 0;
 // ----- End Initialization -----
 
 // ----- Setup -----
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  if (DIGITAL_OUT) {
+  if (DIGITAL_OUT)
+  {
     pinMode(DIGITAL_OUT_PIN, OUTPUT);
   }
 }
 // ----- End Setup -----
 
 // ----- Loop -----
-void loop() {
+void loop()
+{
   delay(2);
-  
+
   // update time
   currentMicros = micros();
 
   // update ecg sample
   int currentEcgSample = analogRead(HEART_PIN);
-  boolean qrsDetected = false;
-  
-  // Write data to serial
-  if (SERIAL_OUT) {
-    if(ECG_SIGNAL_TO_SERIAL){
-      Serial.print(int(qrsDetected));
-      Serial.print(",");
-      Serial.print(currentEcgSample);
-      Serial.print(",");
-      Serial.println(millis());
-    }
-    else{
-      Serial.println(int(qrsDetected));
-    }
+  bool qrsDetected = false;
+
+  // Write data to serial: <peak>,<ecg>,<time>
+  if (SERIAL_OUT)
+  {
+    Serial.print(int(qrsDetected));
+    Serial.print(",");
+    Serial.print(currentEcgSample);
+    Serial.print(",");
+    Serial.print(millis());
+    Serial.println();
+  }
+
+  // write internal signals to serial (for testing)
+  if (INTERNALS_TO_SERIAL)
+  {
+    Serial.print(currentEcgSample);
+    Serial.print(",");
+    Serial.print(ecgSampleFiltered);
+    Serial.print(",");
+    Serial.print(adaptiveThreshold);
+    Serial.println();
   }
 
   // write to digital output pin
-  if (DIGITAL_OUT) {
+  if (DIGITAL_OUT)
+  {
     // write output using windowed method
-    if(USE_HIGH_WINDOW){
+    if (USE_HIGH_WINDOW)
+    {
       // update high window
-      if(qrsDetected){
+      if (qrsDetected)
+      {
         highWindowCounter = HIGH_WINDOW;
       }
-      else if(highWindowCounter > 0){
+      else if (highWindowCounter > 0)
+      {
         highWindowCounter -= 1;
       }
       digitalWrite(DIGITAL_OUT_PIN, highWindowCounter > 0);
     }
     // write qrs without window method
-    else{
+    else
+    {
       digitalWrite(DIGITAL_OUT_PIN, qrsDetected ? HIGH : LOW);
     }
   }
 
   // update peak detection algorithm
   qrsDetected = detectQRS(currentEcgSample);
-  if (qrsDetected) {
+  if (qrsDetected)
+  {
     timeCurrentPeak_micros = micros();
     timeRRPeak_millis = millis();
     timeCprRead2_millis = timeCprRead1_millis;
@@ -271,7 +304,8 @@ void loop() {
   }
 
   // play a sound if peak is detected (during multiple loop iterations)
-  if (lastLoopDuration_millis > cprInterval_millis && PLAY_SOUND == true) {
+  if (lastLoopDuration_millis > cprInterval_millis && PLAY_SOUND == true)
+  {
     tone(TONE_PIN, SOUND_FREQ, SOUND_DURATION);
     timeLastSoundStart_millis = millis();
   }
