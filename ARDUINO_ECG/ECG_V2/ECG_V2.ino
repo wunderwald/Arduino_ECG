@@ -4,18 +4,18 @@ const int TONE_PIN = 2;
 const int HEART_PIN = A1;
 const int DIGITAL_OUT_PIN = 31;
 
+// live data output settings
+const bool SERIAL_OUT = true;         // write data to serial/usb on each loop iteration
+const bool SERIAL_OUT_ONLY_PEAK = false; // ignore time and ecg when using serial out
+const bool INTERNALS_TO_SERIAL = false; // write filtered signals and adaptive thresh to serial
+const bool DIGITAL_OUT = true;         // write peaks to digital output pin
+const bool USE_HIGH_WINDOW = true;
+const int HIGH_WINDOW = 10; // period of time that output stays high after changing from 0 to 1
+
 // Piezo sound settings
 bool PLAY_SOUND = false; /* You can define if you want to activate (true) or deactivate (false) your soundbuzzer. */
 int SOUND_FREQ = 1000;   // The frequency of the sound
 int SOUND_DURATION = 20; // The duration of the sound in millisconds
-
-// live data output settings
-const bool SERIAL_OUT = false;         // write data to serial/usb on each loop iteration
-const bool INTERNALS_TO_SERIAL = true; // write filtered signals and adaptive thresh to serial
-const bool DIGITAL_OUT = true;         // write peaks to digital output pin
-const bool USE_HIGH_WINDOW = true;
-const int HIGH_WINDOW = 10; // period of time that output stays high after changing from 0 to 1
-int highWindowCounter = 0;
 // ----- End Settings -----
 
 // ----- Libraries -----
@@ -60,7 +60,7 @@ float ecgSampleFiltered = 0;
 float hpfSum = 0;
 float lpfSum = 0;
 
-// working variables for adaptive thresholding
+// variables for adaptive thresholding
 float adaptiveThreshold = 0;
 bool qrsTriggered = false;
 int qrsTriggeredLoopCounter = 0;
@@ -69,6 +69,9 @@ int indexInWindow = 0;
 
 // number of starting iterations, used determine when moving windows are filled
 int numIterationsInWindow = 0;
+
+// qrs trigger
+bool qrsDetected = false;
 
 // detection algorithm
 bool detectQRS(float currentEcgSample)
@@ -221,6 +224,12 @@ unsigned long timeRRPeak_millis = 0;
 
 // loop timing
 float lastLoopDuration_millis = 0;
+
+// sound timing
+unsigned long timeLastSoundStart_millis = 0;
+
+// data output counters
+int highWindowCounter = 0;
 // ----- End Initialization -----
 
 // ----- Setup -----
@@ -244,24 +253,24 @@ void loop()
 
   // update ecg sample
   int currentEcgSample = analogRead(HEART_PIN);
-  bool qrsDetected = false;
 
   // Write data to serial: <peak>,<ecg>,<time>
   if (SERIAL_OUT)
   {
     Serial.print(int(qrsDetected));
-    Serial.print(",");
-    Serial.print(currentEcgSample);
-    Serial.print(",");
-    Serial.print(millis());
+    if(!SERIAL_OUT_ONLY_PEAK)
+    {
+      Serial.print(",");
+      Serial.print(currentEcgSample);
+      Serial.print(",");
+      Serial.print(millis());
+    }
     Serial.println();
   }
 
   // write internal signals to serial (for testing)
   if (INTERNALS_TO_SERIAL)
   {
-    Serial.print(currentEcgSample);
-    Serial.print(",");
     Serial.print(ecgSampleFiltered);
     Serial.print(",");
     Serial.print(adaptiveThreshold);
@@ -271,7 +280,7 @@ void loop()
   // write to digital output pin
   if (DIGITAL_OUT)
   {
-    // write output using windowed method
+    // write output using windowed method (stay high for a couple of loops after qrs has been detected)
     if (USE_HIGH_WINDOW)
     {
       // update high window
@@ -285,7 +294,7 @@ void loop()
       }
       digitalWrite(DIGITAL_OUT_PIN, highWindowCounter > 0);
     }
-    // write qrs without window method
+    // write qrs without window method (write peak only in a single loop)
     else
     {
       digitalWrite(DIGITAL_OUT_PIN, qrsDetected ? HIGH : LOW);
