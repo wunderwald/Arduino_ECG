@@ -6,4 +6,5 @@ audio_file = './media/bleep.wav'
 playAudioFFPlay = ['ffplay', '-nodisp', '-autoexit', '-loglevel', 'panic', audio_file]
 
 def playSound():
-    subprocess.call(playAudioFFPlay)
+    # subprocess.call(playAudioFFPlay)
+    subprocess.Popen(playAudioFFPlay)

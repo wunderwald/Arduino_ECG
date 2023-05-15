@@ -1,6 +1,5 @@
 import serial
 import queue
-import threading
 from psychopy import core, visual
 from psychopy.hardware import keyboard
 from functions.trialParams import makeTrialParams_HC
@@ -17,6 +16,7 @@ ARD_PORT = '/dev/cu.usbmodem14101'
 BAUD = 115200
 LOG = True
 OUTPUT_DIR = './subjectData'
+WAIT_TIME_PRE_TRIAL_S = 4
 
 def log(txt):
     if not LOG: return
@@ -75,6 +75,11 @@ if __name__ == "__main__":
     kb = keyboard.Keyboard()
     log("# ... timer, keyboard ready")
 
+    # set up timer functions
+    def waitSecs(secs):
+        startTime = timer.getTime()
+        while timer.getTime() - startTime < secs: pass
+
 
     # ----------
     # EXPERIMENT
@@ -91,6 +96,11 @@ if __name__ == "__main__":
             if endExperiment:
                 log("# Experiment terminated by experimenter")
                 break
+
+            # wait after space press
+            log("# waiting")
+            drawText(win=win, txt="Wait a few seconds...")
+            waitSecs(WAIT_TIME_PRE_TRIAL_S)
 
             log("# Start trial " + str(trial['trialIndex']))
             drawText(win=win, txt="Count your heartbeats until you hear the sound again...")
@@ -150,7 +160,6 @@ if __name__ == "__main__":
             lastEcgSample['trialEnd'] = True
             ecgSignal.put(lastEcgSample)
             
-
             # get user input
             if not endExperiment:
                 drawText(win=win, txt="Enter how many heartbeats you counted!")
