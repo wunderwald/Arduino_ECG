@@ -10,7 +10,7 @@ const int DIGITAL_OUT_PIN = 31;
 
 // live data output settings
 const bool SERIAL_OUT = true;         // write data to serial/usb on each loop iteration
-const bool SERIAL_OUT_ONLY_PEAK = true; // ignore time and ecg when using serial out
+const bool SERIAL_OUT_ONLY_PEAK = false; // ignore time and ecg when using serial out
 const bool INTERNALS_TO_SERIAL = false; // write filtered signals and adaptive thresh to serial
 const bool DIGITAL_OUT = true;         // write peaks to digital output pin
 const bool USE_HIGH_WINDOW = true;
